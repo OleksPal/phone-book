@@ -4,6 +4,7 @@
 @using Radzen.Blazor
 @using PhoneBook.Frontend.Services
 
+@inject DialogService DialogService
 @inject PhoneBookApi PhoneBookApi
 
 <PageTitle>Phone Contacts</PageTitle>
@@ -12,16 +13,54 @@
 
     <RadzenCard Style="padding: 0; overflow: hidden;">
 
-        <div class="px-4 py-3 border-bottom bg-light">
-            <div class="d-flex align-items-center">
-                <div>
-                    <h4 class="mb-1">Phone Contacts</h4>
-                    <small class="text-muted">
-                        @contacts.Length contacts
-                    </small>
+        <RadzenCard class="mb-3">
+            <RadzenStack Orientation="Orientation.Horizontal"
+                         Gap="1rem"
+                         AlignItems="AlignItems.End">
+
+                <div style="flex: 1;">
+                    <RadzenLabel Text="First Name" />
+                    <RadzenTextBox @bind-Value="filter.FirstName"
+                                   Style="width:100%" />
                 </div>
+
+                <div style="flex: 1;">
+                    <RadzenLabel Text="Last Name" />
+                    <RadzenTextBox @bind-Value="filter.LastName"
+                                   Style="width:100%" />
+                </div>
+
+                <div style="flex: 1;">
+                    <RadzenLabel Text="Phone" />
+                    <RadzenTextBox @bind-Value="filter.PhoneNumber"
+                                   Style="width:100%" />
+                </div>
+
+                <RadzenButton Text="Search"
+                              Icon="search"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@Search" />
+
+                <RadzenButton Text="Clear"
+                              Icon="clear"
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="@ClearFilter" />
+
+            </RadzenStack>
+        </RadzenCard>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="mb-0">Phone Contacts</h4>
+                <small class="text-muted">@contacts.Length contacts</small>
             </div>
+
+            <RadzenButton Text="Add Contact"
+                          Icon="add"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Click="@(async () => await AddContact())" />
         </div>
+
 
         <RadzenDataGrid Data="@contacts"
                         TItem="PhoneContact"
@@ -74,6 +113,30 @@
 
                 </RadzenDataGridColumn>
 
+                <RadzenDataGridColumn TItem="PhoneContact"
+                                      Title="Actions"
+                                      Width="130px"
+                                      Sortable="false"
+                                      Filterable="false">
+
+                    <Template Context="contact">
+
+                        <RadzenButton Icon="edit"
+                                      ButtonStyle="ButtonStyle.Primary"
+                                      Size="ButtonSize.Small"
+                                      Click="@(async () => await EditContact(contact))" />
+
+                        <RadzenButton Icon="delete"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Size="ButtonSize.Small"
+                                      class="ms-2"
+                                      Click="@(async () => await DeleteContact(contact))" />
+
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+
             </Columns>
 
         </RadzenDataGrid>
@@ -86,6 +149,8 @@
     private PhoneContact[] contacts = Array.Empty<PhoneContact>();
     private bool isLoading = true;
     private string? errorMessage;
+
+    private PhoneContactFilter filter = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,4 +170,121 @@
             isLoading = false;
         }
     }
+
+    private async Task AddContact()
+    {
+        var result = await DialogService.OpenAsync<EditContactDialog>(
+            "Add Contact",
+            new Dictionary<string, object>
+            {
+            { "Contact", new PhoneContact() }
+            },
+            new DialogOptions
+            {
+                Width = "500px",
+                Resizable = false,
+                Draggable = true
+            });
+
+        if (result is PhoneContact newContact)
+        {
+            await PhoneBookApi.CreateContactAsync(newContact);
+
+            contacts = contacts
+                .Append(newContact)
+                .ToArray();
+        }
+    }
+
+
+    private async Task EditContact(PhoneContact contact)
+    {
+        var result = await DialogService.OpenAsync<EditContactDialog>(
+            "Edit Contact",
+            new Dictionary<string, object>
+            {
+            { "Contact", contact }
+            },
+            new DialogOptions
+            {
+                Width = "500px",
+                Resizable = false,
+                Draggable = true
+            });
+
+        if (result is PhoneContact updatedContact)
+        {
+            await PhoneBookApi.UpdateContactAsync(updatedContact);
+
+            var index = Array.FindIndex(
+                contacts,
+                x => x.Id == updatedContact.Id);
+
+            if (index >= 0)
+            {
+                contacts[index] = updatedContact;
+                contacts = contacts.ToArray();
+            }
+        }
+    }
+
+    private async Task DeleteContact(PhoneContact contact)
+    {
+        var confirmed = await DialogService.Confirm(
+            $"Are you sure you want to delete {contact.FirstName} {contact.LastName}?",
+            "Delete Contact",
+            new ConfirmOptions
+            {
+                OkButtonText = "Delete",
+                CancelButtonText = "Cancel"
+            });
+
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        try
+        {
+            await PhoneBookApi.DeleteContactAsync(contact.Id);
+
+            contacts = contacts
+                .Where(x => x.Id != contact.Id)
+                .ToArray();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to delete contact.";
+            Console.Error.WriteLine(ex);
+        }
+    }
+
+    private async Task Search()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+
+            contacts = await PhoneBookApi.GetContactsAsync(filter);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to load contacts.";
+            Console.Error.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task ClearFilter()
+    {
+        filter = new PhoneContactFilter();
+
+        await Search();
+    }
+
+
 }

@@ -1,0 +1,111 @@
+﻿@using PhoneBook
+@using Radzen
+@using Radzen.Blazor
+
+@inject DialogService DialogService
+
+<RadzenTemplateForm TItem="PhoneContact" Data="@contact" Submit="@Save">
+
+    <RadzenStack Gap="1rem">
+
+        <div>
+            <RadzenLabel Text="First Name" />
+
+            <RadzenTextBox Name="FirstName"
+                           @bind-Value="contact.FirstName"
+                           Style="width:100%" />
+
+            <RadzenRequiredValidator Component="FirstName"
+                                     Text="First name is required"
+                                     Popup="false" />
+        </div>
+
+
+        <div>
+            <RadzenLabel Text="Last Name" />
+
+            <RadzenTextBox Name="LastName"
+                           @bind-Value="contact.LastName"
+                           Style="width:100%" />
+
+            <RadzenRequiredValidator Component="LastName"
+                                     Text="Last name is required"
+                                     Popup="false" />
+        </div>
+
+        <div>
+            <RadzenLabel Text="Phone Number" />
+            <RadzenTextBox Name="PhoneNumber" 
+                @bind-Value="contact.PhoneNumber"
+                           Style="width:100%" />
+
+            <RadzenRequiredValidator Component="PhoneNumber"
+                                     Text="Phone number is required"
+                                     Popup="false" />
+        </div>
+
+        <div>
+            <RadzenLabel Text="Email" />
+
+            <RadzenTextBox Name="Email"
+                           @bind-Value="contact.Email"
+                           Style="width:100%" />
+
+            <RadzenRequiredValidator Component="Email"
+                                     Text="Email is required"
+                                     Popup="false" />
+
+            <RadzenEmailValidator Component="Email"
+                                  Text="Please enter a valid email address"
+                                  Popup="false" />
+        </div>
+
+
+        <RadzenStack Orientation="Orientation.Horizontal"
+                     JustifyContent="JustifyContent.End"
+                     Gap="0.5rem"
+                     Style="margin-top: 1rem">
+
+            <RadzenButton Text="Cancel"
+                          ButtonStyle="ButtonStyle.Light"
+                          Click="@Cancel" />
+
+            <RadzenButton Text="Save"
+                          Icon="save"
+                          ButtonStyle="ButtonStyle.Primary"
+                          ButtonType="ButtonType.Submit" />
+
+        </RadzenStack>
+
+    </RadzenStack>
+
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public PhoneContact Contact { get; set; } = new();
+
+    private PhoneContact contact = new();
+
+    protected override void OnInitialized()
+    {
+        contact = new PhoneContact
+        {
+            Id = Contact.Id,
+            FirstName = Contact.FirstName,
+            LastName = Contact.LastName,
+            PhoneNumber = Contact.PhoneNumber,
+            Email = Contact.Email
+        };
+    }
+
+    private void Save(PhoneContact model)
+    {
+        DialogService.Close(model);
+    }
+
+    private void Cancel()
+    {
+        DialogService.Close(null);
+    }
+}

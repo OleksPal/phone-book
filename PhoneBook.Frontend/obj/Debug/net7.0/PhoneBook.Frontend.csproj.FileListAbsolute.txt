@@ -81,3 +81,4 @@ C:\Users\Home\source\repos\PhoneBook\PhoneBook.Frontend\obj\Debug\net7.0\refint\
 C:\Users\Home\source\repos\PhoneBook\PhoneBook.Frontend\obj\Debug\net7.0\PhoneBook.Frontend.pdb
 C:\Users\Home\source\repos\PhoneBook\PhoneBook.Frontend\obj\Debug\net7.0\PhoneBook.Frontend.genruntimeconfig.cache
 C:\Users\Home\source\repos\PhoneBook\PhoneBook.Frontend\obj\Debug\net7.0\ref\PhoneBook.Frontend.dll
+C:\Users\Home\source\repos\PhoneBook\PhoneBook.Frontend\obj\Debug\net7.0\PhoneBook.Frontend.sourcelink.json

@@ -1,4 +1,5 @@
 using PhoneBook.Frontend.Services;
+using Radzen;
 
 namespace PhoneBook.Frontend
 {
@@ -11,6 +12,9 @@ namespace PhoneBook.Frontend
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
+
+            builder.Services.AddScoped<DialogService>();
+
 
             builder.Services.AddScoped<PhoneBookApi>();
 
