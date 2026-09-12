@@ -1,0 +1,109 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Home\\source\\repos\\PhoneBook\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{BF20F24B-7742-4B14-8260-F3B1C0A3F388}|PhoneBook.Frontend\\PhoneBook.Frontend.csproj|c:\\users\\home\\source\\repos\\phonebook\\phonebook.frontend\\pages\\index.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BF20F24B-7742-4B14-8260-F3B1C0A3F388}|PhoneBook.Frontend\\PhoneBook.Frontend.csproj|solutionrelative:phonebook.frontend\\pages\\index.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF20F24B-7742-4B14-8260-F3B1C0A3F388}|PhoneBook.Frontend\\PhoneBook.Frontend.csproj|c:\\users\\home\\source\\repos\\phonebook\\phonebook.frontend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF20F24B-7742-4B14-8260-F3B1C0A3F388}|PhoneBook.Frontend\\PhoneBook.Frontend.csproj|solutionrelative:phonebook.frontend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF20F24B-7742-4B14-8260-F3B1C0A3F388}|PhoneBook.Frontend\\PhoneBook.Frontend.csproj|c:\\users\\home\\source\\repos\\phonebook\\phonebook.frontend\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{BF20F24B-7742-4B14-8260-F3B1C0A3F388}|PhoneBook.Frontend\\PhoneBook.Frontend.csproj|solutionrelative:phonebook.frontend\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BF20F24B-7742-4B14-8260-F3B1C0A3F388}|PhoneBook.Frontend\\PhoneBook.Frontend.csproj|c:\\users\\home\\source\\repos\\phonebook\\phonebook.frontend\\services\\phonebookapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BF20F24B-7742-4B14-8260-F3B1C0A3F388}|PhoneBook.Frontend\\PhoneBook.Frontend.csproj|solutionrelative:phonebook.frontend\\services\\phonebookapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{944C9A5B-7762-48DB-A77A-4BA815BAD8A3}|PhoneBook.WebService\\PhoneBook.WebService.csproj|c:\\users\\home\\source\\repos\\phonebook\\phonebook.webservice\\properties\\assemblyinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{944C9A5B-7762-48DB-A77A-4BA815BAD8A3}|PhoneBook.WebService\\PhoneBook.WebService.csproj|solutionrelative:phonebook.webservice\\properties\\assemblyinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "_Imports.razor",
+              "DocumentMoniker": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.Frontend\\_Imports.razor",
+              "RelativeDocumentMoniker": "PhoneBook.Frontend\\_Imports.razor",
+              "ToolTip": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.Frontend\\_Imports.razor",
+              "RelativeToolTip": "PhoneBook.Frontend\\_Imports.razor",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-12T15:56:52.958Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.Frontend\\Program.cs",
+              "RelativeDocumentMoniker": "PhoneBook.Frontend\\Program.cs",
+              "ToolTip": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.Frontend\\Program.cs",
+              "RelativeToolTip": "PhoneBook.Frontend\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-12T15:49:29.337Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Index.razor",
+              "DocumentMoniker": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.Frontend\\Pages\\Index.razor",
+              "RelativeDocumentMoniker": "PhoneBook.Frontend\\Pages\\Index.razor",
+              "ToolTip": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.Frontend\\Pages\\Index.razor",
+              "RelativeToolTip": "PhoneBook.Frontend\\Pages\\Index.razor",
+              "ViewState": "AgIAAF4AAAAAAAAAAAAQwIAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-09-12T15:45:57.938Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PhoneBookApi.cs",
+              "DocumentMoniker": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.Frontend\\Services\\PhoneBookApi.cs",
+              "RelativeDocumentMoniker": "PhoneBook.Frontend\\Services\\PhoneBookApi.cs",
+              "ToolTip": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.Frontend\\Services\\PhoneBookApi.cs",
+              "RelativeToolTip": "PhoneBook.Frontend\\Services\\PhoneBookApi.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-12T15:39:04.394Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Properties\\AssemblyInfo.cs",
+              "DocumentMoniker": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.WebService\\Properties\\AssemblyInfo.cs",
+              "RelativeDocumentMoniker": "PhoneBook.WebService\\Properties\\AssemblyInfo.cs",
+              "ToolTip": "C:\\Users\\Home\\source\\repos\\PhoneBook\\PhoneBook.WebService\\Properties\\AssemblyInfo.cs",
+              "RelativeToolTip": "PhoneBook.WebService\\Properties\\AssemblyInfo.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-12T15:21:42.306Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+﻿@page "/"
+
+@using Radzen
+@using Radzen.Blazor
+@using PhoneBook.Frontend.Services
+
+@inject PhoneBookApi PhoneBookApi
+
+<PageTitle>Phone Contacts</PageTitle>
+
+<div class="container-fluid py-4">
+
+    <RadzenCard Style="padding: 0; overflow: hidden;">
+
+        <div class="px-4 py-3 border-bottom bg-light">
+            <div class="d-flex align-items-center">
+                <div>
+                    <h4 class="mb-1">Phone Contacts</h4>
+                    <small class="text-muted">
+                        @contacts.Length contacts
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <RadzenDataGrid Data="@contacts"
+                        TItem="PhoneContact"
+                        AllowPaging="true"
+                        PageSize="10"
+                        AllowSorting="true"
+                        AllowFiltering="false"
+                        AllowColumnResize="true"
+                        ShowPagingSummary="true"
+                        GridLines="DataGridGridLines.Both"
+                        Density="Density.Compact">
+
+            <Columns>
+
+                <RadzenDataGridColumn TItem="PhoneContact"
+                                      Property="@nameof(PhoneContact.FirstName)"
+                                      Title="First Name"
+                                      Width="180px" />
+
+                <RadzenDataGridColumn TItem="PhoneContact"
+                                      Property="@nameof(PhoneContact.LastName)"
+                                      Title="Last Name"
+                                      Width="180px" />
+
+                <RadzenDataGridColumn TItem="PhoneContact"
+                                      Property="@nameof(PhoneContact.PhoneNumber)"
+                                      Title="Phone"
+                                      Width="200px">
+
+                    <Template Context="contact">
+                        <span>
+                            <i class="bi bi-telephone text-primary me-2"></i>
+                            @contact.PhoneNumber
+                        </span>
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn TItem="PhoneContact"
+                                      Property="@nameof(PhoneContact.Email)"
+                                      Title="Email"
+                                      Width="280px">
+
+                    <Template Context="contact">
+                        <span>
+                            <i class="bi bi-envelope text-primary me-2"></i>
+                            @contact.Email
+                        </span>
+                    </Template>
+
+                </RadzenDataGridColumn>
+
+            </Columns>
+
+        </RadzenDataGrid>
+
+    </RadzenCard>
+
+</div>
+
+@code {
+    private PhoneContact[] contacts = Array.Empty<PhoneContact>();
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var filter = new PhoneContactFilter();
+
+            contacts = await PhoneBookApi.GetContactsAsync(filter);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Unable to load contacts.";
+            Console.Error.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
