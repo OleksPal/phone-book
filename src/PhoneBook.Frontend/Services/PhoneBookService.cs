@@ -4,10 +4,9 @@ public class PhoneBookService
 {
     private readonly PhoneBookServiceSoapClient _client;
 
-    public PhoneBookService()
+    public PhoneBookService(PhoneBookServiceSoapClient client)
     {
-        _client = new PhoneBookServiceSoapClient(
-            PhoneBookServiceSoapClient.EndpointConfiguration.PhoneBookServiceSoap);
+        _client = client;
     }
 
     public async Task<PagedItemsOfPhoneContact> GetContactsAsync(PhoneContactFilter filter, 

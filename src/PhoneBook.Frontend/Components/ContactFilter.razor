@@ -1,0 +1,56 @@
+﻿@using Radzen
+@using Radzen.Blazor
+@using PhoneBook.Frontend.Services
+
+<RadzenCard class="mb-3">
+    <RadzenStack Orientation="Orientation.Horizontal"
+                 Gap="1rem"
+                 AlignItems="AlignItems.End">
+
+        <div style="flex: 1;">
+            <RadzenLabel Text="First Name" />
+            <RadzenTextBox @bind-Value="Filter.FirstName"
+                           Style="width:100%" />
+        </div>
+
+        <div style="flex: 1;">
+            <RadzenLabel Text="Last Name" />
+            <RadzenTextBox @bind-Value="Filter.LastName"
+                           Style="width:100%" />
+        </div>
+
+        <div style="flex: 1;">
+            <RadzenLabel Text="Phone" />
+            <RadzenTextBox @bind-Value="Filter.PhoneNumber"
+                           Style="width:100%" />
+        </div>
+
+        <div style="flex: 1;">
+            <RadzenLabel Text="Email" />
+            <RadzenTextBox @bind-Value="Filter.Email"
+                           Style="width:100%" />
+        </div>
+
+        <RadzenButton Text="Search"
+                      Icon="search"
+                      ButtonStyle="ButtonStyle.Primary"
+                      Click="@Search" />
+
+        <RadzenButton Text="Clear"
+                      Icon="clear"
+                      ButtonStyle="ButtonStyle.Light"
+                      Click="@Clear" />
+
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public PhoneContactFilter Filter { get; set; } = new();
+
+    [Parameter]
+    public EventCallback Search { get; set; }
+
+    [Parameter]
+    public EventCallback Clear { get; set; }
+}

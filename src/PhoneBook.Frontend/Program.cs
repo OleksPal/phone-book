@@ -9,11 +9,13 @@ namespace PhoneBook.Frontend
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
 
             builder.Services.AddScoped<DialogService>();
+            builder.Services.AddScoped<PhoneBookServiceSoapClient>(sp =>
+                new PhoneBookServiceSoapClient(
+                    PhoneBookServiceSoapClient.EndpointConfiguration.PhoneBookServiceSoap));
             builder.Services.AddScoped<PhoneBookService>();
 
             var app = builder.Build();

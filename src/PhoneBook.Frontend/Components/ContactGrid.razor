@@ -1,0 +1,126 @@
+﻿@using Radzen
+@using Radzen.Blazor
+@using PhoneBook.Frontend.Services
+
+<RadzenDataGrid @ref="grid"
+                Data="@Contacts"
+                TItem="PhoneContact"
+                Count="@TotalCount"
+                LoadData="@LoadData"
+                AllowPaging="true"
+                PageSize="@PageSize"
+                AllowSorting="true"
+                AllowFiltering="false"
+                AllowColumnResize="true"
+                ShowPagingSummary="true"
+                GridLines="DataGridGridLines.Both"
+                Density="Density.Compact">
+
+    <Columns>
+
+        <RadzenDataGridColumn TItem="PhoneContact"
+                              Property="@nameof(PhoneContact.FirstName)"
+                              Title="First Name"
+                              Width="180px" />
+
+        <RadzenDataGridColumn TItem="PhoneContact"
+                              Property="@nameof(PhoneContact.LastName)"
+                              Title="Last Name"
+                              Width="180px" />
+
+        <RadzenDataGridColumn TItem="PhoneContact"
+                              Property="@nameof(PhoneContact.PhoneNumber)"
+                              Title="Phone"
+                              Width="200px">
+
+            <Template Context="contact">
+                <span>
+                    <i class="bi bi-telephone text-primary me-2"></i>
+                    @contact.PhoneNumber
+                </span>
+            </Template>
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="PhoneContact"
+                              Property="@nameof(PhoneContact.Email)"
+                              Title="Email"
+                              Width="280px">
+
+            <Template Context="contact">
+                <span>
+                    <i class="bi bi-envelope text-primary me-2"></i>
+                    @contact.Email
+                </span>
+            </Template>
+
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="PhoneContact"
+                              Title="Actions"
+                              Width="130px"
+                              Sortable="false"
+                              Filterable="false">
+
+            <Template Context="contact">
+
+                <div class="d-flex justify-content-around align-items-center w-100">
+
+                    <RadzenButton Icon="edit"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => Edit.InvokeAsync(contact))" />
+
+                    <RadzenButton Icon="delete"
+                                  ButtonStyle="ButtonStyle.Danger"
+                                  Size="ButtonSize.Small"
+                                  Click="@(() => Delete.InvokeAsync(contact))" />
+
+                </div>
+
+            </Template>
+
+        </RadzenDataGridColumn>
+
+    </Columns>
+
+</RadzenDataGrid>
+
+@code {
+    private RadzenDataGrid<PhoneContact>? grid;
+
+    [Parameter]
+    public IEnumerable<PhoneContact> Contacts { get; set; }
+        = Enumerable.Empty<PhoneContact>();
+
+    [Parameter]
+    public int TotalCount { get; set; }
+
+    [Parameter]
+    public int PageSize { get; set; } = 10;
+
+    [Parameter]
+    public EventCallback<LoadDataArgs> LoadData { get; set; }
+
+    [Parameter]
+    public EventCallback<PhoneContact> Edit { get; set; }
+
+    [Parameter]
+    public EventCallback<PhoneContact> Delete { get; set; }
+
+    public async Task Reload()
+    {
+        if (grid is not null)
+        {
+            await grid.Reload();
+        }
+    }
+
+    public async Task FirstPage()
+    {
+        if (grid is not null)
+        {
+            await grid.FirstPage();
+        }
+    }
+}
