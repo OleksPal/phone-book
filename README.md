@@ -5,8 +5,6 @@ A simple phone contacts application built with an **ASP.NET ASMX web service** b
 The application supports:
 
 - Viewing phone contacts
-- Server-side pagination
-- Server-side sorting
 - Filtering by first name, last name, phone number, and email (list)
 - Creating contacts
 - Editing contacts
@@ -21,10 +19,10 @@ The application supports:
 The repository contains a SQL initialization script:
 
 ```text
-database/PhoneBook.sql
+scripts/PhoneBook.sql
 ```
 
-Open `database/PhoneBook.sql` in SQL Server Management Studio and execute it.
+Open `scripts/PhoneBook.sql` in SQL Server Management Studio and execute it.
 
 The script will:
 
@@ -48,17 +46,6 @@ Before running the application:
 2. Open the new `Web.config` file.
 3. Replace `YOUR_SQL_SERVER` with your SQL Server instance.
 4. Save the file.
-
-Example:
-
-```xml
-<connectionStrings>
-  <add
-    name="PhoneBookDb"
-    connectionString="Data Source=YOUR_SQL_SERVER;Initial Catalog=PhoneBook;Integrated Security=True"
-    providerName="System.Data.SqlClient" />
-</connectionStrings>
-```
 
 For example, for a local SQL Server installation:
 
