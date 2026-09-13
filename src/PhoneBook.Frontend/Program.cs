@@ -14,8 +14,6 @@ namespace PhoneBook.Frontend
             builder.Services.AddServerSideBlazor();
 
             builder.Services.AddScoped<DialogService>();
-
-
             builder.Services.AddScoped<PhoneBookService>();
 
             var app = builder.Build();

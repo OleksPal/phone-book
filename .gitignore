@@ -39,6 +39,7 @@ _ReSharper*/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+Web.config
 
 # ASP.NET / web development
 wwwroot/lib/
