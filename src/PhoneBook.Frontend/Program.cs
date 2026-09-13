@@ -16,7 +16,7 @@ namespace PhoneBook.Frontend
             builder.Services.AddScoped<DialogService>();
 
 
-            builder.Services.AddScoped<PhoneBookApi>();
+            builder.Services.AddScoped<PhoneBookService>();
 
             var app = builder.Build();
 

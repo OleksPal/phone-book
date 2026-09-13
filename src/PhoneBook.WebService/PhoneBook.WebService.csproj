@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\PhoneContactRepository.cs" />
+    <Compile Include="Models\PagedItems.cs" />
     <Compile Include="Models\PhoneContact.cs" />
     <Compile Include="Models\PhoneContactFilter.cs" />
     <Compile Include="PhoneBookService.asmx.cs">

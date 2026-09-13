@@ -19,11 +19,37 @@ namespace PhoneBookWebService.Data
                     .ConnectionString;
         }
 
-        public List<PhoneContact> GetContacts(PhoneContactFilter filter)
+        public PagedItems<PhoneContact> GetContacts(PhoneContactFilter filter, 
+            int pageNumber = 1, int pageSize = 10, 
+            string sortColumn =  "FirstName", string sortOrder = "asc")
         {
-            var contacts = new List<PhoneContact>();
+            if (pageNumber < 1)
+                pageNumber = 1;
 
-            const string sql = @"
+            if (pageSize < 1)
+                pageSize = 10;
+
+            if (pageSize > 100)
+                pageSize = 100;
+
+            string orderBy = GetOrderBy(sortColumn, sortOrder);
+
+            var result = new PagedItems<PhoneContact>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            const string countSql = @"
+                SELECT COUNT(*)
+                FROM PhoneContacts
+                WHERE
+                    (@FirstName IS NULL OR FirstName LIKE '%' + @FirstName + '%')
+                    AND (@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
+                    AND (@PhoneNumber IS NULL OR PhoneNumber LIKE '%' + @PhoneNumber + '%')
+                    AND (@Email IS NULL OR Email LIKE '%' + @Email + '%');";
+
+            var dataSql = string.Format(@"
                 SELECT
                     Id,
                     FirstName,
@@ -36,37 +62,47 @@ namespace PhoneBookWebService.Data
                     AND (@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
                     AND (@PhoneNumber IS NULL OR PhoneNumber LIKE '%' + @PhoneNumber + '%')
                     AND (@Email IS NULL OR Email LIKE '%' + @Email + '%')
-                ORDER BY LastName, FirstName;";
+                ORDER BY {0}
+                OFFSET @Offset ROWS
+                FETCH NEXT @PageSize ROWS ONLY;",
+                orderBy);
+
 
             using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(sql, connection))
             {
-                command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 100)
-                    .Value = (object)filter.FirstName ?? DBNull.Value;
-
-                command.Parameters.Add("@LastName", SqlDbType.NVarChar, 100)
-                    .Value = (object)filter.LastName ?? DBNull.Value;
-
-                command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar, 50)
-                    .Value = (object)filter.PhoneNumber ?? DBNull.Value;
-
-                command.Parameters.Add("@Email", SqlDbType.NVarChar, 255)
-                    .Value = (object)filter.Email ?? DBNull.Value;
-
                 connection.Open();
 
-                using (var reader = command.ExecuteReader())
+                using (var countCommand = new SqlCommand(countSql, connection))
                 {
-                    while (reader.Read())
+                    AddFilterParameters(countCommand, filter);
+
+                    result.TotalCount = (int)countCommand.ExecuteScalar();
+                }
+
+                using (var command = new SqlCommand(dataSql, connection))
+                {
+                    AddFilterParameters(command, filter);
+
+                    var offset = (pageNumber - 1) * pageSize;
+
+                    command.Parameters.Add("@Offset", SqlDbType.Int)
+                        .Value = offset;
+
+                    command.Parameters.Add("@PageSize", SqlDbType.Int)
+                        .Value = pageSize;
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        contacts.Add(MapContact(reader));
+                        while (reader.Read())
+                        {
+                            result.Items.Add(MapContact(reader));
+                        }
                     }
                 }
             }
 
-            return contacts;
+            return result;
         }
-
 
         public PhoneContact GetContactById(int id)
         {
@@ -192,6 +228,53 @@ namespace PhoneBookWebService.Data
             }
         }
 
+        private void AddFilterParameters(
+            SqlCommand command,
+            PhoneContactFilter filter)
+        {
+            command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 100)
+                .Value = (object)filter.FirstName ?? DBNull.Value;
+
+            command.Parameters.Add("@LastName", SqlDbType.NVarChar, 100)
+                .Value = (object)filter.LastName ?? DBNull.Value;
+
+            command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar, 50)
+                .Value = (object)filter.PhoneNumber ?? DBNull.Value;
+
+            command.Parameters.Add("@Email", SqlDbType.NVarChar, 255)
+                .Value = (object)filter.Email ?? DBNull.Value;
+        }
+
+        private static string GetOrderBy(string sortColumn, string sortOrder)
+        {
+            string column;
+
+            switch (sortColumn)
+            {
+                case "FirstName":
+                    column = "FirstName";
+                    break;
+                case "LastName":
+                    column = "LastName";
+                    break;
+                case "PhoneNumber":
+                    column = "PhoneNumber";
+                    break;
+                case "Email":
+                    column = "Email";
+                    break;
+                default:
+                    column = "LastName";
+                    break;
+            }
+
+            return column + (
+                string.Equals(sortOrder, "desc", StringComparison.OrdinalIgnoreCase)
+                    ? " DESC"
+                    : " ASC")
+                    + ", Id ASC";
+        }
+
         private PhoneContact MapContact(SqlDataReader reader)
         {
             return new PhoneContact
@@ -223,6 +306,6 @@ namespace PhoneBookWebService.Data
                     : reader.GetString(
                         reader.GetOrdinal("Email"))
             };
-        }
+        }        
     }
 }

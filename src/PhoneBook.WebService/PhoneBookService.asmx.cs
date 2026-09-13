@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Web.Services;
-using PhoneBookWebService.Data;
+﻿using PhoneBookWebService.Data;
 using PhoneBookWebService.Models;
+using System.Web.Services;
 
 namespace PhoneBookWebService
 {
@@ -17,9 +16,11 @@ namespace PhoneBookWebService
         }
 
         [WebMethod]
-        public List<PhoneContact> GetContacts(PhoneContactFilter filter)
+        public PagedItems<PhoneContact> GetContacts(PhoneContactFilter filter, 
+            int pageNumber, int pageSize, 
+            string sortColumn, string sortOrder)
         {
-            return _repository.GetContacts(filter);
+            return _repository.GetContacts(filter, pageNumber, pageSize, sortColumn, sortOrder);
         }
 
         [WebMethod]

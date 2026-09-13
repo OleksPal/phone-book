@@ -1,20 +1,22 @@
 ﻿namespace PhoneBook.Frontend.Services;
 
-public class PhoneBookApi
+public class PhoneBookService
 {
     private readonly PhoneBookServiceSoapClient _client;
 
-    public PhoneBookApi()
+    public PhoneBookService()
     {
         _client = new PhoneBookServiceSoapClient(
             PhoneBookServiceSoapClient.EndpointConfiguration.PhoneBookServiceSoap);
     }
 
-    public async Task<PhoneContact[]> GetContactsAsync(PhoneContactFilter filter)
+    public async Task<PagedItemsOfPhoneContact> GetContactsAsync(PhoneContactFilter filter, 
+        int pageNumber, int pageSize, 
+        string sortColumn, string sortOrder)
     {
-        var response = await _client.GetContactsAsync(filter);
+        var response = await _client.GetContactsAsync(filter, pageNumber, pageSize, sortColumn, sortOrder);
 
-        return response.Body.GetContactsResult ?? Array.Empty<PhoneContact>();
+        return response.Body.GetContactsResult;
     }
 
     public async Task<PhoneContact?> GetContactAsync(int id)

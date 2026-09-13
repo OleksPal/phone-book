@@ -81,6 +81,73 @@ namespace PhoneBook
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PagedItemsOfPhoneContact", Namespace="http://mycompany.com/phonebook")]
+    public partial class PagedItemsOfPhoneContact : object
+    {
+        
+        private PhoneBook.PhoneContact[] ItemsField;
+        
+        private int TotalCountField;
+        
+        private int PageNumberField;
+        
+        private int PageSizeField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false)]
+        public PhoneBook.PhoneContact[] Items
+        {
+            get
+            {
+                return this.ItemsField;
+            }
+            set
+            {
+                this.ItemsField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int TotalCount
+        {
+            get
+            {
+                return this.TotalCountField;
+            }
+            set
+            {
+                this.TotalCountField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public int PageNumber
+        {
+            get
+            {
+                return this.PageNumberField;
+            }
+            set
+            {
+                this.PageNumberField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        public int PageSize
+        {
+            get
+            {
+                return this.PageSizeField;
+            }
+            set
+            {
+                this.PageSizeField = value;
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="PhoneContact", Namespace="http://mycompany.com/phonebook")]
     public partial class PhoneContact : object
     {
@@ -212,13 +279,29 @@ namespace PhoneBook
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
         public PhoneBook.PhoneContactFilter filter;
         
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public int pageNumber;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public int pageSize;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string sortColumn;
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string sortOrder;
+        
         public GetContactsRequestBody()
         {
         }
         
-        public GetContactsRequestBody(PhoneBook.PhoneContactFilter filter)
+        public GetContactsRequestBody(PhoneBook.PhoneContactFilter filter, int pageNumber, int pageSize, string sortColumn, string sortOrder)
         {
             this.filter = filter;
+            this.pageNumber = pageNumber;
+            this.pageSize = pageSize;
+            this.sortColumn = sortColumn;
+            this.sortOrder = sortOrder;
         }
     }
     
@@ -250,13 +333,13 @@ namespace PhoneBook
     {
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=0)]
-        public PhoneBook.PhoneContact[] GetContactsResult;
+        public PhoneBook.PagedItemsOfPhoneContact GetContactsResult;
         
         public GetContactsResponseBody()
         {
         }
         
-        public GetContactsResponseBody(PhoneBook.PhoneContact[] GetContactsResult)
+        public GetContactsResponseBody(PhoneBook.PagedItemsOfPhoneContact GetContactsResult)
         {
             this.GetContactsResult = GetContactsResult;
         }
@@ -551,11 +634,15 @@ namespace PhoneBook
             return base.Channel.GetContactsAsync(request);
         }
         
-        public System.Threading.Tasks.Task<PhoneBook.GetContactsResponse> GetContactsAsync(PhoneBook.PhoneContactFilter filter)
+        public System.Threading.Tasks.Task<PhoneBook.GetContactsResponse> GetContactsAsync(PhoneBook.PhoneContactFilter filter, int pageNumber, int pageSize, string sortColumn, string sortOrder)
         {
             PhoneBook.GetContactsRequest inValue = new PhoneBook.GetContactsRequest();
             inValue.Body = new PhoneBook.GetContactsRequestBody();
             inValue.Body.filter = filter;
+            inValue.Body.pageNumber = pageNumber;
+            inValue.Body.pageSize = pageSize;
+            inValue.Body.sortColumn = sortColumn;
+            inValue.Body.sortOrder = sortOrder;
             return ((PhoneBook.PhoneBookServiceSoap)(this)).GetContactsAsync(inValue);
         }
         

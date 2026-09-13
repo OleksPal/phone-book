@@ -5,7 +5,7 @@
 @using PhoneBook.Frontend.Services
 
 @inject DialogService DialogService
-@inject PhoneBookApi PhoneBookApi
+@inject PhoneBookService PhoneBookApi
 
 <PageTitle>Phone Contacts</PageTitle>
 
@@ -36,6 +36,12 @@
                                    Style="width:100%" />
                 </div>
 
+                <div style="flex: 1;">
+                    <RadzenLabel Text="Email" />
+                    <RadzenTextBox @bind-Value="filter.Email"
+                                   Style="width:100%" />
+                </div>
+
                 <RadzenButton Text="Search"
                               Icon="search"
                               ButtonStyle="ButtonStyle.Primary"
@@ -50,22 +56,26 @@
         </RadzenCard>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
+            <div class="ms-2">
                 <h4 class="mb-0">Phone Contacts</h4>
-                <small class="text-muted">@contacts.Length contacts</small>
+                <small class="text-muted">@totalCount contacts</small>
             </div>
 
             <RadzenButton Text="Add Contact"
                           Icon="add"
+                          class="me-2"
                           ButtonStyle="ButtonStyle.Primary"
                           Click="@(async () => await AddContact())" />
         </div>
 
 
-        <RadzenDataGrid Data="@contacts"
+        <RadzenDataGrid @ref="grid"
+                        Data="@contacts"
                         TItem="PhoneContact"
+                        Count="@totalCount"
+                        LoadData="@LoadData"
                         AllowPaging="true"
-                        PageSize="10"
+                        PageSize="@pageSize"
                         AllowSorting="true"
                         AllowFiltering="false"
                         AllowColumnResize="true"
@@ -121,16 +131,17 @@
 
                     <Template Context="contact">
 
-                        <RadzenButton Icon="edit"
-                                      ButtonStyle="ButtonStyle.Primary"
-                                      Size="ButtonSize.Small"
-                                      Click="@(async () => await EditContact(contact))" />
+                        <div class="d-flex justify-content-around align-items-center w-100">
+                            <RadzenButton Icon="edit"
+                                          ButtonStyle="ButtonStyle.Primary"
+                                          Size="ButtonSize.Small"
+                                          Click="@(async () => await EditContact(contact))" />
 
-                        <RadzenButton Icon="delete"
-                                      ButtonStyle="ButtonStyle.Danger"
-                                      Size="ButtonSize.Small"
-                                      class="ms-2"
-                                      Click="@(async () => await DeleteContact(contact))" />
+                            <RadzenButton Icon="delete"
+                                          ButtonStyle="ButtonStyle.Danger"
+                                          Size="ButtonSize.Small"
+                                          Click="@(async () => await DeleteContact(contact))" />
+                        </div>
 
                     </Template>
 
@@ -146,24 +157,73 @@
 </div>
 
 @code {
-    private PhoneContact[] contacts = Array.Empty<PhoneContact>();
+    private IEnumerable<PhoneContact> contacts = new List<PhoneContact>();
+
+    private int totalCount;
+    private int pageSize = 10;
+
+    private string sortColumn = "LastName";
+    private string sortOrder = "asc";
+
     private bool isLoading = true;
     private string? errorMessage;
+
+    private RadzenDataGrid<PhoneContact>? grid;
 
     private PhoneContactFilter filter = new();
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadData(new LoadDataArgs
+        {
+            Skip = 0,
+            Top = pageSize
+        });
+    }
+
+    private async Task LoadData(LoadDataArgs args)
+    {
         try
         {
-            var filter = new PhoneContactFilter();
+            var skip = args.Skip ?? 0;
+            var top = args.Top ?? pageSize;
 
-            contacts = await PhoneBookApi.GetContactsAsync(filter);
+            if (!string.IsNullOrEmpty(args.OrderBy))
+            {
+                var parts = args.OrderBy.Split(' ');
+
+                sortColumn = parts[0];
+
+                if (parts.Length > 1)
+                {
+                    sortOrder = parts[1].ToLower();
+                }
+            }
+
+            var pageNumber = (skip / top) + 1;
+
+            pageSize = top;
+
+            isLoading = true;
+            errorMessage = null;
+
+            var result = await PhoneBookApi.GetContactsAsync(
+                filter,
+                pageNumber, pageSize,
+                sortColumn, sortOrder);
+
+            contacts = result.Items;
+            totalCount = result.TotalCount;
+
+            UpdateSorting(args.OrderBy);
         }
         catch (Exception ex)
         {
             errorMessage = "Unable to load contacts.";
             Console.Error.WriteLine(ex);
+
+            contacts = Array.Empty<PhoneContact>();
+            totalCount = 0;
         }
         finally
         {
@@ -173,7 +233,7 @@
 
     private async Task AddContact()
     {
-        var result = await DialogService.OpenAsync<EditContactDialog>(
+        var result = await DialogService.OpenAsync<ContactDialog>(
             "Add Contact",
             new Dictionary<string, object>
             {
@@ -190,16 +250,13 @@
         {
             await PhoneBookApi.CreateContactAsync(newContact);
 
-            contacts = contacts
-                .Append(newContact)
-                .ToArray();
+            await grid!.Reload();
         }
     }
 
-
     private async Task EditContact(PhoneContact contact)
     {
-        var result = await DialogService.OpenAsync<EditContactDialog>(
+        var result = await DialogService.OpenAsync<ContactDialog>(
             "Edit Contact",
             new Dictionary<string, object>
             {
@@ -216,15 +273,7 @@
         {
             await PhoneBookApi.UpdateContactAsync(updatedContact);
 
-            var index = Array.FindIndex(
-                contacts,
-                x => x.Id == updatedContact.Id);
-
-            if (index >= 0)
-            {
-                contacts[index] = updatedContact;
-                contacts = contacts.ToArray();
-            }
+            await grid!.Reload();
         }
     }
 
@@ -248,9 +297,7 @@
         {
             await PhoneBookApi.DeleteContactAsync(contact.Id);
 
-            contacts = contacts
-                .Where(x => x.Id != contact.Id)
-                .ToArray();
+            await grid!.Reload();
         }
         catch (Exception ex)
         {
@@ -266,7 +313,17 @@
             isLoading = true;
             errorMessage = null;
 
-            contacts = await PhoneBookApi.GetContactsAsync(filter);
+            await LoadData(new LoadDataArgs
+            {
+                Skip = 0,
+                Top = pageSize,
+                OrderBy = sortColumn + " " + sortOrder
+            });
+
+            if (grid != null)
+            {
+                await grid.FirstPage();
+            }
         }
         catch (Exception ex)
         {
@@ -286,5 +343,21 @@
         await Search();
     }
 
+    private void UpdateSorting(string orderBy)
+    {
+        if (string.IsNullOrWhiteSpace(orderBy))
+        {
+            sortColumn = "LastName";
+            sortOrder = "asc";
+            return;
+        }
+
+        var parts = orderBy.Split(' ');
+
+        sortColumn = parts[0];
+        sortOrder = parts.Length > 1
+            ? parts[1].ToLower()
+            : "asc";
+    }
 
 }
