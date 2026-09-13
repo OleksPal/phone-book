@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -9,6 +8,12 @@ namespace PhoneBookWebService.Data
 {
     public class PhoneContactRepository
     {
+        private const string ContactFilterSql = @"
+            (@FirstName IS NULL OR FirstName LIKE '%' + @FirstName + '%')
+            AND (@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
+            AND (@PhoneNumber IS NULL OR PhoneNumber LIKE '%' + @PhoneNumber + '%')
+            AND (@Email IS NULL OR Email LIKE '%' + @Email + '%')";
+
         private readonly string _connectionString;
 
         public PhoneContactRepository()
@@ -23,6 +28,8 @@ namespace PhoneBookWebService.Data
             int pageNumber = 1, int pageSize = 10, 
             string sortColumn =  "FirstName", string sortOrder = "asc")
         {
+            filter = filter ?? new PhoneContactFilter();
+
             if (pageNumber < 1)
                 pageNumber = 1;
 
@@ -32,7 +39,7 @@ namespace PhoneBookWebService.Data
             if (pageSize > 100)
                 pageSize = 100;
 
-            string orderBy = GetOrderBy(sortColumn, sortOrder);
+            var orderBy = GetOrderBy(sortColumn, sortOrder);
 
             var result = new PagedItems<PhoneContact>
             {
@@ -40,16 +47,12 @@ namespace PhoneBookWebService.Data
                 PageSize = pageSize
             };
 
-            const string countSql = @"
+            var countSql = $@"
                 SELECT COUNT(*)
                 FROM PhoneContacts
-                WHERE
-                    (@FirstName IS NULL OR FirstName LIKE '%' + @FirstName + '%')
-                    AND (@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
-                    AND (@PhoneNumber IS NULL OR PhoneNumber LIKE '%' + @PhoneNumber + '%')
-                    AND (@Email IS NULL OR Email LIKE '%' + @Email + '%');";
+                WHERE {ContactFilterSql};";
 
-            var dataSql = string.Format(@"
+            var dataSql = $@"
                 SELECT
                     Id,
                     FirstName,
@@ -57,16 +60,10 @@ namespace PhoneBookWebService.Data
                     PhoneNumber,
                     Email
                 FROM PhoneContacts
-                WHERE
-                    (@FirstName IS NULL OR FirstName LIKE '%' + @FirstName + '%')
-                    AND (@LastName IS NULL OR LastName LIKE '%' + @LastName + '%')
-                    AND (@PhoneNumber IS NULL OR PhoneNumber LIKE '%' + @PhoneNumber + '%')
-                    AND (@Email IS NULL OR Email LIKE '%' + @Email + '%')
-                ORDER BY {0}
+                WHERE {ContactFilterSql}
+                ORDER BY {orderBy}
                 OFFSET @Offset ROWS
-                FETCH NEXT @PageSize ROWS ONLY;",
-                orderBy);
-
+                FETCH NEXT @PageSize ROWS ONLY;";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -137,6 +134,9 @@ namespace PhoneBookWebService.Data
 
         public int AddContact(PhoneContact contact)
         {
+            if (contact == null)
+                throw new ArgumentNullException(nameof(contact));
+
             const string sql = @"
                 INSERT INTO PhoneContacts
                 (
@@ -158,17 +158,7 @@ namespace PhoneBookWebService.Data
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(sql, connection))
             {
-                command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 100)
-                    .Value = (object)contact.FirstName ?? DBNull.Value;
-
-                command.Parameters.Add("@LastName", SqlDbType.NVarChar, 100)
-                    .Value = (object)contact.LastName ?? DBNull.Value;
-
-                command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar, 50)
-                    .Value = (object)contact.PhoneNumber ?? DBNull.Value;
-
-                command.Parameters.Add("@Email", SqlDbType.NVarChar, 255)
-                    .Value = (object)contact.Email ?? DBNull.Value;
+                AddContactParameters(command, contact);
 
                 connection.Open();
 
@@ -178,6 +168,9 @@ namespace PhoneBookWebService.Data
 
         public bool UpdateContact(PhoneContact contact)
         {
+            if (contact == null)
+                throw new ArgumentNullException(nameof(contact));
+
             const string sql = @"
                 UPDATE PhoneContacts
                 SET
@@ -193,17 +186,7 @@ namespace PhoneBookWebService.Data
                 command.Parameters.Add("@Id", SqlDbType.Int)
                     .Value = contact.Id;
 
-                command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 100)
-                    .Value = (object)contact.FirstName ?? DBNull.Value;
-
-                command.Parameters.Add("@LastName", SqlDbType.NVarChar, 100)
-                    .Value = (object)contact.LastName ?? DBNull.Value;
-
-                command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar, 50)
-                    .Value = (object)contact.PhoneNumber ?? DBNull.Value;
-
-                command.Parameters.Add("@Email", SqlDbType.NVarChar, 255)
-                    .Value = (object)contact.Email ?? DBNull.Value;
+                AddContactParameters(command, contact);
 
                 connection.Open();
 
@@ -275,37 +258,44 @@ namespace PhoneBookWebService.Data
                     + ", Id ASC";
         }
 
+        private static void AddContactParameters(
+            SqlCommand command,
+            PhoneContact contact)
+        {
+            command.Parameters.Add("@FirstName", SqlDbType.NVarChar, 100)
+                .Value = (object)contact.FirstName ?? DBNull.Value;
+
+            command.Parameters.Add("@LastName", SqlDbType.NVarChar, 100)
+                .Value = (object)contact.LastName ?? DBNull.Value;
+
+            command.Parameters.Add("@PhoneNumber", SqlDbType.NVarChar, 50)
+                .Value = (object)contact.PhoneNumber ?? DBNull.Value;
+
+            command.Parameters.Add("@Email", SqlDbType.NVarChar, 255)
+                .Value = (object)contact.Email ?? DBNull.Value;
+        }
+
         private PhoneContact MapContact(SqlDataReader reader)
         {
             return new PhoneContact
             {
-                Id = reader.GetInt32(
-                    reader.GetOrdinal("Id")),
-
-                FirstName = reader.IsDBNull(
-                    reader.GetOrdinal("FirstName"))
-                    ? null
-                    : reader.GetString(
-                        reader.GetOrdinal("FirstName")),
-
-                LastName = reader.IsDBNull(
-                    reader.GetOrdinal("LastName"))
-                    ? null
-                    : reader.GetString(
-                        reader.GetOrdinal("LastName")),
-
-                PhoneNumber = reader.IsDBNull(
-                    reader.GetOrdinal("PhoneNumber"))
-                    ? null
-                    : reader.GetString(
-                        reader.GetOrdinal("PhoneNumber")),
-
-                Email = reader.IsDBNull(
-                    reader.GetOrdinal("Email"))
-                    ? null
-                    : reader.GetString(
-                        reader.GetOrdinal("Email"))
+                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                FirstName = GetNullableString(reader, "FirstName"),
+                LastName = GetNullableString(reader, "LastName"),
+                PhoneNumber = GetNullableString(reader, "PhoneNumber"),
+                Email = GetNullableString(reader, "Email")
             };
-        }        
+        }
+
+        private static string GetNullableString(
+            SqlDataReader reader,
+            string columnName)
+        {
+            var ordinal = reader.GetOrdinal(columnName);
+
+            return reader.IsDBNull(ordinal)
+                ? null
+                : reader.GetString(ordinal);
+        }
     }
 }
