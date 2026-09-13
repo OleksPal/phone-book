@@ -12,6 +12,10 @@ The application supports:
 - Editing contacts
 - Deleting contacts
 
+## Application Preview
+
+![PhoneBook application](images/phonebook.png)
+
 ## Database Setup
 
 The repository contains a SQL initialization script:
@@ -28,24 +32,52 @@ The script will:
 2. Create the `PhoneContacts` table.
 3. Insert sample contacts for testing.
 
-After running the script, update the connection string in the ASMX project's `Web.config`:
+## Database Connection
+
+The ASMX backend uses `Web.config` for the SQL Server connection string.
+
+For security reasons, the actual `Web.config` file is not included in the repository. A template is provided instead:
+
+```text
+src/PhoneBook.WebService/Web.config.template
+```
+
+Before running the application:
+
+1. Copy `Web.config.template` to `Web.config`.
+2. Open the new `Web.config` file.
+3. Replace `YOUR_SQL_SERVER` with your SQL Server instance.
+4. Save the file.
+
+Example:
 
 ```xml
 <connectionStrings>
   <add
     name="PhoneBookDb"
-    connectionString="Data Source=Your_Data_Source;Initial Catalog=PhoneBook;Integrated Security=True"
+    connectionString="Data Source=YOUR_SQL_SERVER;Initial Catalog=PhoneBook;Integrated Security=True"
     providerName="System.Data.SqlClient" />
 </connectionStrings>
 ```
 
-Replace `Your_Data_Source` with your SQL Server instance.
-
-For example:
+For example, for a local SQL Server installation:
 
 ```xml
-connectionString="Data Source=localhost;Initial Catalog=PhoneBook;Integrated Security=True"
+<connectionStrings>
+  <add
+    name="PhoneBookDb"
+    connectionString="Data Source=localhost;Initial Catalog=PhoneBook;Integrated Security=True"
+    providerName="System.Data.SqlClient" />
+</connectionStrings>
 ```
+
+The resulting file should be named:
+
+```text
+Web.config
+```
+
+and should be located in the ASMX backend project directory.
 
 ## Running the Application
 
